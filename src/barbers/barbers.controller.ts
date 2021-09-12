@@ -1,10 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
   ParseIntPipe,
+  Post,
 } from '@nestjs/common';
 import { Barber } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -22,6 +24,17 @@ function barberToDto(barber: Barber) {
     description: barber.description,
   };
   return dto;
+}
+
+interface CreateBarberDto {
+  name: string;
+  description: string;
+}
+
+interface UpdateBarberDto {
+  id: number;
+  name?: string;
+  description?: string;
 }
 
 @Controller('barbers')
@@ -43,6 +56,28 @@ export class BarbersController {
     if (barber == null) {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
+    const barberDto = barberToDto(barber);
+    return barberDto;
+  }
+
+  @Post()
+  async createBarber(@Body() dto: CreateBarberDto) {
+    const newBarber = await this.prisma.barber.create({
+      data: { name: dto.name, description: dto.description },
+    });
+    const newBarberDto = barberToDto(newBarber);
+    return newBarberDto;
+  }
+
+  @Post('/update')
+  async updateBarber(@Body() dto: UpdateBarberDto) {
+    const barber = await this.prisma.barber.update({
+      where: { id: dto.id },
+      data: {
+        name: dto.name,
+        description: dto.description,
+      },
+    });
     const barberDto = barberToDto(barber);
     return barberDto;
   }
