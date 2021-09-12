@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('barbers')
 export class BarbersController {
+  constructor(private prisma: PrismaService) {}
+
   @Get()
   async findAll() {
-    const client = new PrismaClient();
-    const barbers = await client.barber.findMany();
+    const barbers = await this.prisma.barber.findMany();
     return barbers;
   }
 }
