@@ -15,3 +15,10 @@ model Barber {
   name        String
   description String
 }
+
+model BarberService {
+  id          Int     @id @default(autoincrement())
+  name        String
+  price       Decimal
+  description String
+}
