@@ -15,6 +15,7 @@ interface BarberDto {
   id: number;
   name: string;
   description: string;
+  picture: string | null;
 }
 
 function barberToDto(barber: Barber) {
@@ -22,6 +23,7 @@ function barberToDto(barber: Barber) {
     id: barber.id,
     name: barber.name,
     description: barber.description,
+    picture: barber.picture,
   };
   return dto;
 }
@@ -29,12 +31,14 @@ function barberToDto(barber: Barber) {
 interface CreateBarberDto {
   name: string;
   description: string;
+  picture: string | null;
 }
 
 interface UpdateBarberDto {
   id: number;
   name?: string;
   description?: string;
+  picture?: string | null;
 }
 
 @Controller('barbers')
@@ -63,7 +67,11 @@ export class BarbersController {
   @Post()
   async createBarber(@Body() dto: CreateBarberDto) {
     const newBarber = await this.prisma.barber.create({
-      data: { name: dto.name, description: dto.description },
+      data: {
+        name: dto.name,
+        description: dto.description,
+        picture: dto.picture,
+      },
     });
     const newBarberDto = barberToDto(newBarber);
     return newBarberDto;
@@ -76,6 +84,7 @@ export class BarbersController {
       data: {
         name: dto.name,
         description: dto.description,
+        picture: dto.picture,
       },
     });
     const barberDto = barberToDto(barber);
