@@ -1,15 +1,21 @@
 import {
   Controller,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as crypto from 'crypto';
+import { Response } from 'express';
+import { createReadStream } from 'fs';
 import * as multer from 'multer';
 import * as path from 'path';
-import * as crypto from 'crypto';
+import { join } from 'path';
 
 const multerStorage = multer.diskStorage({
   destination: 'uploads/images',
@@ -32,5 +38,12 @@ export class ImagesController {
       );
     }
     return file.filename;
+  }
+
+  @Get(':filename')
+  getImage(@Param('filename') filename: string, @Res() response: Response) {
+    const filepath = join(process.cwd(), 'uploads', 'images', filename);
+    const file = createReadStream(filepath);
+    file.pipe(response);
   }
 }
