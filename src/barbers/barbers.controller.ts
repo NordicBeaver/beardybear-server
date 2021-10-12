@@ -11,14 +11,14 @@ import {
 import { Barber } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-interface BarberDto {
+export interface BarberDto {
   id: number;
   name: string;
   description: string;
   picture: string | null;
 }
 
-function barberToDto(barber: Barber) {
+export function barberToDto(barber: Barber) {
   const dto: BarberDto = {
     id: barber.id,
     name: barber.name,

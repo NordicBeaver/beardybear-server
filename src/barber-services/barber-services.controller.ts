@@ -11,14 +11,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-interface BarberServiceDto {
+export interface BarberServiceDto {
   id: number;
   name: string;
   price: string;
   description: string;
 }
 
-function barberServiceToDto(barberService: BarberService) {
+export function barberServiceToDto(barberService: BarberService) {
   const dto: BarberServiceDto = {
     id: barberService.id,
     name: barberService.name,
