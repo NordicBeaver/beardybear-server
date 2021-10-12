@@ -1,5 +1,5 @@
 import { Appointment, Barber, BarberService } from '@prisma/client';
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import {
   BarberServiceDto,
   barberServiceToDto,
@@ -29,6 +29,13 @@ function appointmentToDto(appointment: AppointmentFull) {
   return dto;
 }
 
+interface CreateAppointmentDto {
+  id: number;
+  barberId: number;
+  barberServiceId: number;
+  datetime: string;
+}
+
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private prisma: PrismaService) {}
@@ -40,5 +47,22 @@ export class AppointmentsController {
     });
     const appointmentsDto = appointments.map(appointmentToDto);
     return appointmentsDto;
+  }
+
+  @Post()
+  async createAppointment(@Body() dto: CreateAppointmentDto) {
+    const appointment = await this.prisma.appointment.create({
+      data: {
+        barberId: dto.barberId,
+        barberServiceId: dto.barberServiceId,
+        datetime: dto.datetime,
+      },
+      include: {
+        barber: true,
+        barberService: true,
+      },
+    });
+    const appointmentDto = appointmentToDto(appointment);
+    return appointmentDto;
   }
 }
