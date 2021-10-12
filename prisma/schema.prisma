@@ -11,15 +11,26 @@ generator client {
 }
 
 model Barber {
-  id          Int     @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   name        String
   description String
   picture     String?
+  Appointment Appointment[]
 }
 
 model BarberService {
-  id          Int     @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   name        String
   price       Decimal
   description String
+  Appointment Appointment[]
+}
+
+model Appointment {
+  id              Int           @id @default(autoincrement())
+  barber          Barber        @relation(fields: [barberId], references: [id])
+  barberId        Int
+  barberService   BarberService @relation(fields: [barberServiceId], references: [id])
+  barberServiceId Int
+  datetime        DateTime
 }
