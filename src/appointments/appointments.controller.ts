@@ -39,7 +39,6 @@ function appointmentToDto(appointment: AppointmentFull) {
 }
 
 interface CreateAppointmentDto {
-  id: number;
   barberId: number;
   barberServiceId: number;
   datetime: string;
