@@ -8,6 +8,7 @@ import { ImagesController } from './images/images.controller';
 import { AppointmentsController } from './appointments/appointments.controller';
 import { AuthController } from './auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './auth/jwt.strategy';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { JwtModule } from '@nestjs/jwt';
     AppointmentsController,
     AuthController,
   ],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService, JwtStrategy],
 })
 export class AppModule {}

@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   BarberServiceDto,
@@ -15,6 +16,7 @@ import {
 } from 'src/barber-services/barber-services.controller';
 import { BarberDto, barberToDto } from 'src/barbers/barbers.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthGuard } from '@nestjs/passport';
 
 interface AppoinmentDto {
   id: number;
@@ -55,6 +57,7 @@ interface UpdateAppointmentDto {
 export class AppointmentsController {
   constructor(private prisma: PrismaService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll() {
     const appointments = await this.prisma.appointment.findMany({
