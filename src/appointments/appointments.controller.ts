@@ -67,6 +67,7 @@ export class AppointmentsController {
     return appointmentsDto;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) appointmentId: number) {
     const appointment = await this.prisma.appointment.findFirst({
@@ -94,6 +95,7 @@ export class AppointmentsController {
     return appointmentDto;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('/update')
   async updateAppointment(@Body() dto: UpdateAppointmentDto) {
     const appointment = await this.prisma.appointment.update({

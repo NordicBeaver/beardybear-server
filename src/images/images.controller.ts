@@ -7,8 +7,10 @@ import {
   Post,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as crypto from 'crypto';
 import { Response } from 'express';
@@ -28,6 +30,7 @@ const multerStorage = multer.diskStorage({
 
 @Controller('images')
 export class ImagesController {
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @UseInterceptors(FileInterceptor('file', { storage: multerStorage }))
   upload(@UploadedFile() file?: Express.Multer.File) {

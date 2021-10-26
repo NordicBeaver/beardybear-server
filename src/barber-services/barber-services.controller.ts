@@ -8,7 +8,9 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface BarberServiceDto {
@@ -64,6 +66,7 @@ export class BarberServicesController {
     return barberServiceDto;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async createBarberService(@Body() dto: CreateBarberServiceDto) {
     const newBarberService = await this.prisma.barberService.create({
@@ -77,6 +80,7 @@ export class BarberServicesController {
     return newBarberServiceDto;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('/update')
   async updateBarberService(@Body() dto: UpdateBarberServiceDto) {
     const barberService = await this.prisma.barberService.update({
