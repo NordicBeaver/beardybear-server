@@ -9,11 +9,13 @@ import { AppointmentsController } from './appointments/appointments.controller';
 import { AuthController } from './auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     JwtModule.register({
-      secret: '77d018aacc7bd36f3304673c78548f4c',
+      secret: process.env.JWT_SECRET,
     }),
   ],
   controllers: [
