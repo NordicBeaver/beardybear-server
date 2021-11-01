@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Barber } from '@prisma/client';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface BarberDto {
@@ -30,9 +31,18 @@ export function barberToDto(barber: Barber) {
   return dto;
 }
 
-interface CreateBarberDto {
+class CreateBarberDto {
+  @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   picture: string | null;
 }
 
