@@ -6,9 +6,15 @@ import {
   Post,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-interface Credentials {
+class Credentials {
+  @IsString()
+  @IsNotEmpty()
   username: string;
+
+  @IsString()
+  @IsNotEmpty()
   password: string;
 }
 
