@@ -11,6 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import {
+  IsDecimal,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface BarberServiceDto {
@@ -30,16 +37,37 @@ export function barberServiceToDto(barberService: BarberService) {
   return dto;
 }
 
-interface CreateBarberServiceDto {
+class CreateBarberServiceDto {
+  @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsDecimal()
   price: string;
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
 }
 
-interface UpdateBarberServiceDto {
+class UpdateBarberServiceDto {
+  @IsNumber()
   id: number;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   name?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsDecimal()
   price?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   description?: string;
 }
 
