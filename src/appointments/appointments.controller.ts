@@ -1,4 +1,3 @@
-import { Appointment, Barber, BarberService } from '@prisma/client';
 import {
   Body,
   Controller,
@@ -10,13 +9,15 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Appointment, Barber, BarberService } from '@prisma/client';
+import { IsDateString, IsNumber, IsOptional } from 'class-validator';
 import {
   BarberServiceDto,
   barberServiceToDto,
 } from 'src/barber-services/barber-services.controller';
 import { BarberDto, barberToDto } from 'src/barbers/barbers.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthGuard } from '@nestjs/passport';
 
 interface AppoinmentDto {
   id: number;
@@ -40,16 +41,31 @@ function appointmentToDto(appointment: AppointmentFull) {
   return dto;
 }
 
-interface CreateAppointmentDto {
+class CreateAppointmentDto {
+  @IsNumber()
   barberId: number;
+
+  @IsNumber()
   barberServiceId: number;
+
+  @IsDateString()
   datetime: string;
 }
 
-interface UpdateAppointmentDto {
+class UpdateAppointmentDto {
+  @IsNumber()
   id: number;
+
+  @IsOptional()
+  @IsNumber()
   barberId?: number;
+
+  @IsOptional()
+  @IsNumber()
   barberServiceId?: number;
+
+  @IsOptional()
+  @IsDateString()
   datetime?: string;
 }
 
