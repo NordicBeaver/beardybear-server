@@ -27,10 +27,12 @@ model BarberService {
 }
 
 model Appointment {
-  id              Int           @id @default(autoincrement())
-  barber          Barber        @relation(fields: [barberId], references: [id])
-  barberId        Int
-  barberService   BarberService @relation(fields: [barberServiceId], references: [id])
-  barberServiceId Int
-  datetime        DateTime
+  id                Int           @id @default(autoincrement())
+  barber            Barber        @relation(fields: [barberId], references: [id])
+  barberId          Int
+  barberService     BarberService @relation(fields: [barberServiceId], references: [id])
+  barberServiceId   Int
+  datetime          DateTime
+  clientName        String
+  clientPhoneNumber String
 }
