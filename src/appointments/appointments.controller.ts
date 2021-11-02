@@ -11,7 +11,13 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Appointment, Barber, BarberService } from '@prisma/client';
-import { IsDateString, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import {
   BarberServiceDto,
   barberServiceToDto,
@@ -24,6 +30,8 @@ interface AppoinmentDto {
   barber: BarberDto;
   barberService: BarberServiceDto;
   datetime: string;
+  clientName: string;
+  clientPhoneNumber: string;
 }
 
 type AppointmentFull = Appointment & {
@@ -37,6 +45,8 @@ function appointmentToDto(appointment: AppointmentFull) {
     barber: barberToDto(appointment.barber),
     barberService: barberServiceToDto(appointment.barberService),
     datetime: appointment.datetime.toISOString(),
+    clientName: appointment.clientName,
+    clientPhoneNumber: appointment.clientPhoneNumber,
   };
   return dto;
 }
@@ -50,6 +60,14 @@ class CreateAppointmentDto {
 
   @IsDateString()
   datetime: string;
+
+  @IsString()
+  @IsNotEmpty()
+  clientName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  clientPhoneNumber: string;
 }
 
 class UpdateAppointmentDto {
@@ -67,6 +85,16 @@ class UpdateAppointmentDto {
   @IsOptional()
   @IsDateString()
   datetime?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  clientName?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  clientPhoneNumber?: string;
 }
 
 @Controller('appointments')
@@ -104,6 +132,8 @@ export class AppointmentsController {
         barberId: dto.barberId,
         barberServiceId: dto.barberServiceId,
         datetime: dto.datetime,
+        clientName: dto.clientName,
+        clientPhoneNumber: dto.clientPhoneNumber,
       },
       include: { barber: true, barberService: true },
     });
@@ -120,6 +150,8 @@ export class AppointmentsController {
         barberId: dto.barberId,
         barberServiceId: dto.barberServiceId,
         datetime: dto.datetime,
+        clientName: dto.clientName,
+        clientPhoneNumber: dto.clientPhoneNumber,
       },
       include: { barber: true, barberService: true },
     });
