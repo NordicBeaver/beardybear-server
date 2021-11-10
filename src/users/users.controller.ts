@@ -65,6 +65,12 @@ async function hashPassord(password: string): Promise<[string, string]> {
 export class UsersController {
   constructor(private prisma: PrismaService) {}
 
+  @Get('/any')
+  async hasAny() {
+    const usersCount = await this.prisma.user.count();
+    return usersCount > 0;
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll() {
