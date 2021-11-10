@@ -107,6 +107,28 @@ export class UsersController {
     return newuserDto;
   }
 
+  @Post('/create-first')
+  async createFirstUser(@Body() dto: CreateUserDto) {
+    const usersCount = await this.prisma.user.count();
+    if (usersCount > 0) {
+      throw new HttpException(
+        'There already are existing users.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const [hash, salt] = await hashPassord(dto.password);
+    const newUser = await this.prisma.user.create({
+      data: {
+        name: dto.name,
+        passwordHash: hash,
+        passwordSalt: salt,
+      },
+    });
+    const newuserDto = userToDto(newUser);
+    return newuserDto;
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('/update')
   async updateUser(@Body() dto: UpdateUserDto) {
