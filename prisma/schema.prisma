@@ -11,10 +11,17 @@ generator client {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   name         String
   passwordHash String
   passwordSalt String
+  role         UserRole
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  GUEST
 }
 
 model Barber {

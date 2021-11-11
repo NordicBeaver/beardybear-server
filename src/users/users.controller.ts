@@ -1,4 +1,4 @@
-import { User } from '.prisma/client';
+import { User, UserRole } from '.prisma/client';
 import {
   Body,
   Controller,
@@ -101,6 +101,7 @@ export class UsersController {
         name: dto.name,
         passwordHash: hash,
         passwordSalt: salt,
+        role: UserRole.ADMIN,
       },
     });
     const newuserDto = userToDto(newUser);
@@ -123,6 +124,7 @@ export class UsersController {
         name: dto.name,
         passwordHash: hash,
         passwordSalt: salt,
+        role: UserRole.ADMIN,
       },
     });
     const newuserDto = userToDto(newUser);
