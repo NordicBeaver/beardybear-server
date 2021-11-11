@@ -27,12 +27,14 @@ import { promisify } from 'util';
 export interface UserDto {
   id: number;
   name: string;
+  role: string;
 }
 
 export function userToDto(user: User) {
   const dto: UserDto = {
     id: user.id,
     name: user.name,
+    role: user.role,
   };
   return dto;
 }
@@ -54,6 +56,16 @@ class CreateUserDto {
     },
   })
   role: UserRole;
+}
+
+class CreateFirstUserDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }
 
 class UpdateUserDto {
@@ -147,7 +159,7 @@ export class UsersController {
   }
 
   @Post('/create-first')
-  async createFirstUser(@Body() dto: CreateUserDto) {
+  async createFirstUser(@Body() dto: CreateFirstUserDto) {
     const usersCount = await this.prisma.user.count();
     if (usersCount > 0) {
       throw new HttpException(
