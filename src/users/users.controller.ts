@@ -92,6 +92,14 @@ async function hashPassord(password: string): Promise<[string, string]> {
 export class UsersController {
   constructor(private prisma: PrismaService) {}
 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('/roles')
+  async getRoles() {
+    const roles = Object.values(UserRole);
+    return roles;
+  }
+
   @Get('/any')
   async hasAny() {
     const usersCount = await this.prisma.user.count();
