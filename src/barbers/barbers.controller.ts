@@ -10,8 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Barber } from '@prisma/client';
+import { Barber, UserRole } from '@prisma/client';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface BarberDto {
@@ -89,7 +91,8 @@ export class BarbersController {
     return barberDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   async createBarber(@Body() dto: CreateBarberDto) {
     const newBarber = await this.prisma.barber.create({
