@@ -12,12 +12,15 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserRole } from '@prisma/client';
 import * as crypto from 'crypto';
 import { Response } from 'express';
 import { createReadStream } from 'fs';
 import * as multer from 'multer';
 import * as path from 'path';
 import { join } from 'path';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 const multerStorage = multer.diskStorage({
   destination: 'uploads/images',
@@ -30,7 +33,8 @@ const multerStorage = multer.diskStorage({
 
 @Controller('images')
 export class ImagesController {
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   @UseInterceptors(FileInterceptor('file', { storage: multerStorage }))
   upload(@UploadedFile() file?: Express.Multer.File) {

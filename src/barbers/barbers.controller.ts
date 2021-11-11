@@ -106,7 +106,8 @@ export class BarbersController {
     return newBarberDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post('/update')
   async updateBarber(@Body() dto: UpdateBarberDto) {
     const barber = await this.prisma.barber.update({

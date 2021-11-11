@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Appointment, Barber, BarberService } from '@prisma/client';
+import { Appointment, Barber, BarberService, UserRole } from '@prisma/client';
 import {
   IsDateString,
   IsNotEmpty,
@@ -18,6 +18,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import {
   BarberServiceDto,
   barberServiceToDto,
@@ -101,7 +103,8 @@ class UpdateAppointmentDto {
 export class AppointmentsController {
   constructor(private prisma: PrismaService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.GUEST)
   @Get()
   async findAll() {
     const appointments = await this.prisma.appointment.findMany({
@@ -111,7 +114,8 @@ export class AppointmentsController {
     return appointmentsDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.GUEST)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) appointmentId: number) {
     const appointment = await this.prisma.appointment.findFirst({
@@ -141,7 +145,8 @@ export class AppointmentsController {
     return appointmentDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post('/update')
   async updateAppointment(@Body() dto: UpdateAppointmentDto) {
     const appointment = await this.prisma.appointment.update({

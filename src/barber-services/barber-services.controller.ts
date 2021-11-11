@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { UserRole } from '@prisma/client';
 import {
   IsDecimal,
   IsNotEmpty,
@@ -18,6 +19,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface BarberServiceDto {
@@ -94,7 +97,8 @@ export class BarberServicesController {
     return barberServiceDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   async createBarberService(@Body() dto: CreateBarberServiceDto) {
     const newBarberService = await this.prisma.barberService.create({
@@ -108,7 +112,8 @@ export class BarberServicesController {
     return newBarberServiceDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @Post('/update')
   async updateBarberService(@Body() dto: UpdateBarberServiceDto) {
     const barberService = await this.prisma.barberService.update({

@@ -13,6 +13,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { randomBytes, scrypt } from 'crypto';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { promisify } from 'util';
 
@@ -71,7 +73,8 @@ export class UsersController {
     return usersCount > 0;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get()
   async findAll() {
     const users = await this.prisma.user.findMany();
@@ -79,7 +82,8 @@ export class UsersController {
     return usersDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) userId: number) {
     const user = await this.prisma.user.findFirst({
@@ -92,7 +96,8 @@ export class UsersController {
     return userDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post()
   async createUser(@Body() dto: CreateUserDto) {
     const [hash, salt] = await hashPassord(dto.password);
@@ -131,7 +136,8 @@ export class UsersController {
     return newuserDto;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('/update')
   async updateUser(@Body() dto: UpdateUserDto) {
     const [newHash, newSalt] =
