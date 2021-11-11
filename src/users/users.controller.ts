@@ -11,7 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { randomBytes, scrypt } from 'crypto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -39,6 +45,15 @@ class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsString()
+  @IsEnum(UserRole, {
+    message: () => {
+      const roles = Object.values(UserRole);
+      return `Role must be one of the following: ${roles.join(', ')}.`;
+    },
+  })
+  role: UserRole;
 }
 
 class UpdateUserDto {
@@ -54,6 +69,16 @@ class UpdateUserDto {
   @IsString()
   @IsNotEmpty()
   password?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(UserRole, {
+    message: () => {
+      const roles = Object.values(UserRole);
+      return `Role must be one of the following: ${roles.join(', ')}.`;
+    },
+  })
+  role?: UserRole;
 }
 
 async function hashPassord(password: string): Promise<[string, string]> {
@@ -106,7 +131,7 @@ export class UsersController {
         name: dto.name,
         passwordHash: hash,
         passwordSalt: salt,
-        role: UserRole.ADMIN,
+        role: dto.role,
       },
     });
     const newuserDto = userToDto(newUser);
@@ -152,6 +177,7 @@ export class UsersController {
         name: dto.name,
         passwordHash: newHash,
         passwordSalt: newSalt,
+        role: dto.role,
       },
     });
     const userDto = userToDto(user);
