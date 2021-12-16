@@ -51,6 +51,9 @@ export class ImagesController {
   getImage(@Param('filename') filename: string, @Res() response: Response) {
     const filepath = join(process.cwd(), 'uploads', 'images', filename);
     const file = createReadStream(filepath);
+    file.on('error', () => {
+      response.status(404).send('File not found');
+    });
     file.pipe(response);
   }
 }
