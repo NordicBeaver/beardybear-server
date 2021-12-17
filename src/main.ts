@@ -8,7 +8,7 @@ async function bootstrap() {
   app.enableCors();
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
 }

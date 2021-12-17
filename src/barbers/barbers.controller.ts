@@ -7,11 +7,19 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Barber, UserRole } from '@prisma/client';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -33,6 +41,13 @@ export function barberToDto(barber: Barber) {
     deletedAt: barber.deletedAt?.toISOString(),
   };
   return dto;
+}
+
+class FindAllBarbersParams {
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value == 'true')
+  includeDeleted?: boolean;
 }
 
 class CreateBarberDto {
@@ -80,8 +95,12 @@ export class BarbersController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
-  async findAll() {
-    const barbers = await this.prisma.barber.findMany();
+  async findAll(@Query() query: FindAllBarbersParams) {
+    const barbers = await this.prisma.barber.findMany({
+      where: {
+        deletedAt: query.includeDeleted === true ? undefined : null,
+      },
+    });
     const barbersDto = barbers.map(barberToDto);
     return barbersDto;
   }
