@@ -30,6 +30,7 @@ model Barber {
   description String
   picture     String?
   Appointment Appointment[]
+  deletedAt   DateTime?
 }
 
 model BarberService {

@@ -21,6 +21,7 @@ export interface BarberDto {
   name: string;
   description: string;
   picture: string | null;
+  deletedAt?: string;
 }
 
 export function barberToDto(barber: Barber) {
@@ -29,6 +30,7 @@ export function barberToDto(barber: Barber) {
     name: barber.name,
     description: barber.description,
     picture: barber.picture,
+    deletedAt: barber.deletedAt?.toISOString(),
   };
   return dto;
 }
@@ -66,6 +68,11 @@ class UpdateBarberDto {
   @IsString()
   @IsNotEmpty()
   picture?: string | null;
+}
+
+class DeleteBarberDto {
+  @IsNumber()
+  id: number;
 }
 
 @Controller('barbers')
@@ -116,6 +123,20 @@ export class BarbersController {
         name: dto.name,
         description: dto.description,
         picture: dto.picture,
+      },
+    });
+    const barberDto = barberToDto(barber);
+    return barberDto;
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Post('/delete')
+  async deleteBarber(@Body() dto: DeleteBarberDto) {
+    const barber = await this.prisma.barber.update({
+      where: { id: dto.id },
+      data: {
+        deletedAt: new Date(),
       },
     });
     const barberDto = barberToDto(barber);
