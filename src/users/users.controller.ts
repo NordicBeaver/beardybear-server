@@ -1,4 +1,4 @@
-import { User, UserRole } from '.prisma/client';
+import { Prisma, User, UserRole } from '.prisma/client';
 import {
   Body,
   Controller,
@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -37,6 +38,16 @@ export function userToDto(user: User) {
     role: user.role,
   };
   return dto;
+}
+
+class FindAllUsersParams {
+  @IsOptional()
+  @IsString()
+  sortField?: 'name' | 'role';
+
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
 }
 
 class CreateUserDto {
@@ -121,8 +132,15 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get()
-  async findAll() {
-    const users = await this.prisma.user.findMany();
+  async findAll(@Query() query: FindAllUsersParams) {
+    const sortOrder =
+      query.sortOrder === 'desc' ? Prisma.SortOrder.desc : Prisma.SortOrder.asc;
+    const users = await this.prisma.user.findMany({
+      orderBy: {
+        name: query.sortField === 'name' ? sortOrder : undefined,
+        role: query.sortField === 'role' ? sortOrder : undefined,
+      },
+    });
     const usersDto = users.map(userToDto);
     return usersDto;
   }

@@ -8,10 +8,11 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import {
   IsDecimal,
   IsNotEmpty,
@@ -38,6 +39,16 @@ export function barberServiceToDto(barberService: BarberService) {
     description: barberService.description,
   };
   return dto;
+}
+
+class FindAllBarberServicesParams {
+  @IsOptional()
+  @IsString()
+  sortField?: 'name' | 'price' | 'description';
+
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
 }
 
 class CreateBarberServiceDto {
@@ -79,8 +90,16 @@ export class BarberServicesController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
-  async findAll() {
-    const barberServices = await this.prisma.barberService.findMany();
+  async findAll(@Query() query: FindAllBarberServicesParams) {
+    const sortOrder =
+      query.sortOrder === 'desc' ? Prisma.SortOrder.desc : Prisma.SortOrder.asc;
+    const barberServices = await this.prisma.barberService.findMany({
+      orderBy: {
+        name: query.sortField === 'name' ? sortOrder : undefined,
+        price: query.sortField === 'price' ? sortOrder : undefined,
+        description: query.sortField === 'description' ? sortOrder : undefined,
+      },
+    });
     const barberServicesDto = barberServices.map(barberServiceToDto);
     return barberServicesDto;
   }

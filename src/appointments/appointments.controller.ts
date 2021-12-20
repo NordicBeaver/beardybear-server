@@ -7,10 +7,17 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Appointment, Barber, BarberService, UserRole } from '@prisma/client';
+import {
+  Appointment,
+  Barber,
+  BarberService,
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 import {
   IsDateString,
   IsNotEmpty,
@@ -51,6 +58,16 @@ function appointmentToDto(appointment: AppointmentFull) {
     clientPhoneNumber: appointment.clientPhoneNumber,
   };
   return dto;
+}
+
+class FindAllAppointmentsParams {
+  @IsOptional()
+  @IsString()
+  sortField?: 'barber' | 'service' | 'datetime';
+
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
 }
 
 class CreateAppointmentDto {
@@ -106,9 +123,17 @@ export class AppointmentsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.GUEST)
   @Get()
-  async findAll() {
+  async findAll(@Query() query: FindAllAppointmentsParams) {
+    const sortOrder =
+      query.sortOrder === 'desc' ? Prisma.SortOrder.desc : Prisma.SortOrder.asc;
     const appointments = await this.prisma.appointment.findMany({
       include: { barber: true, barberService: true },
+      orderBy: {
+        barber: query.sortField === 'barber' ? { name: sortOrder } : undefined,
+        barberService:
+          query.sortField === 'service' ? { name: sortOrder } : undefined,
+        datetime: query.sortField === 'datetime' ? sortOrder : undefined,
+      },
     });
     const appointmentsDto = appointments.map(appointmentToDto);
     return appointmentsDto;
