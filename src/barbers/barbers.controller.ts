@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Barber, UserRole } from '@prisma/client';
+import { Barber, Prisma, UserRole } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsBoolean,
@@ -48,6 +48,14 @@ class FindAllBarbersParams {
   @IsBoolean()
   @Transform(({ value }) => value == 'true')
   includeDeleted?: boolean;
+
+  @IsOptional()
+  @IsString()
+  sortField?: 'name' | 'description';
+
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
 }
 
 class CreateBarberDto {
@@ -96,9 +104,15 @@ export class BarbersController {
 
   @Get()
   async findAll(@Query() query: FindAllBarbersParams) {
+    const sortOrder =
+      query.sortOrder === 'desc' ? Prisma.SortOrder.desc : Prisma.SortOrder.asc;
     const barbers = await this.prisma.barber.findMany({
       where: {
         deletedAt: query.includeDeleted === true ? undefined : null,
+      },
+      orderBy: {
+        name: query.sortField === 'name' ? sortOrder : undefined,
+        description: query.sortField === 'description' ? sortOrder : undefined,
       },
     });
     const barbersDto = barbers.map(barberToDto);
