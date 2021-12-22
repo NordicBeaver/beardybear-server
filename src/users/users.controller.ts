@@ -19,11 +19,10 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { randomBytes, scrypt } from 'crypto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { promisify } from 'util';
+import { hashPassord } from 'src/utils';
 
 export interface UserDto {
   id: number;
@@ -102,13 +101,6 @@ class UpdateUserDto {
     },
   })
   role?: UserRole;
-}
-
-async function hashPassord(password: string): Promise<[string, string]> {
-  const salt = randomBytes(8).toString('hex');
-  const hashBuffer = (await promisify(scrypt)(password, salt, 64)) as Buffer;
-  const hash = hashBuffer.toString('hex');
-  return [hash, salt];
 }
 
 @Controller('users')

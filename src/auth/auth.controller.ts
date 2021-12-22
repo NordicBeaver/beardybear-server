@@ -7,9 +7,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { scrypt } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { promisify } from 'util';
+import { checkPassword } from 'src/utils';
 
 class Credentials {
   @IsString()
@@ -39,13 +38,12 @@ export class AuthController {
       throw invalidCredentialsError;
     }
 
-    const hashBuffer = (await promisify(scrypt)(
+    const passwordCorrect = checkPassword(
       password,
       user.passwordSalt,
-      64,
-    )) as Buffer;
-    const hash = hashBuffer.toString('hex');
-    if (hash !== user.passwordHash) {
+      user.passwordHash,
+    );
+    if (!passwordCorrect) {
       throw invalidCredentialsError;
     }
 
