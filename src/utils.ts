@@ -17,3 +17,8 @@ export async function checkPassword(
   const calculatedHash = hashBuffer.toString('hex');
   return calculatedHash === hash;
 }
+
+export function sample<T>(array: T[]) {
+  const index = Math.floor(Math.random() * array.length);
+  return array[index];
+}
