@@ -18,6 +18,7 @@ import {
   Prisma,
   UserRole,
 } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsNotEmpty,
@@ -68,6 +69,16 @@ class FindAllAppointmentsParams {
   @IsOptional()
   @IsString()
   sortOrder?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value))
+  limit?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value))
+  offset?: number;
 }
 
 class CreateAppointmentDto {
@@ -134,6 +145,8 @@ export class AppointmentsController {
           query.sortField === 'service' ? { name: sortOrder } : undefined,
         datetime: query.sortField === 'datetime' ? sortOrder : undefined,
       },
+      skip: query.offset,
+      take: query.limit,
     });
     const appointmentsDto = appointments.map(appointmentToDto);
     return appointmentsDto;
