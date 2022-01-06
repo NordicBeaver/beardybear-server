@@ -154,6 +154,16 @@ export class AppointmentsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.GUEST)
+  @Get('/count')
+  async count() {
+    const count = await this.prisma.appointment.count();
+    return {
+      count: count,
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.GUEST)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) appointmentId: number) {
     const appointment = await this.prisma.appointment.findFirst({
